@@ -2,9 +2,9 @@ name: E-commerce CI/CD Pipeline
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -47,7 +47,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
 
@@ -77,7 +77,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem $EC2_USER@$EC2_HOST << EOF
             echo "Deploying to EC2..."
             cd $EC2_PROJECT_DIR || exit 1
-            git pull origin master || exit 1
+            git pull origin main || exit 1
             npm install || exit 1
             pm2 restart all || pm2 start server.js --name ecommerce-app
             echo "Deployment done!"
@@ -85,5 +85,3 @@ jobs:
 
       - name: Cleanup
         run: rm -f key.pem
-
-
